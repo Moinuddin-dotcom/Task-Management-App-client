@@ -1,13 +1,15 @@
 import toast from "react-hot-toast"
 import useAuth from "../../Hooks/useAuth"
-import useAxiosPublic from "../../Hooks/useAxiosPublic"
+// import useAxiosPublic from "../../Hooks/useAxiosPublic"
 import { useNavigate } from "react-router-dom"
+import useAxiosSecure from "../../Hooks/useAxiosSecure"
 
 
 const GLogin = () => {
     const { googleLogin } = useAuth()
     const navigate = useNavigate()
-    const axiosPublic = useAxiosPublic()
+    // const axiosPublic = useAxiosPublic()
+    const axiosSecure = useAxiosSecure()
     const handleGoogle = async () => {
         try {
             const res = await googleLogin()
@@ -18,10 +20,13 @@ const GLogin = () => {
                 name: res.user.displayName,
                 photo: res.user.photoURL,
             }
-            const { data } = await axiosPublic.post('/users', userInfo)
+            const { data } = await axiosSecure.post('/users', userInfo)
             console.log(data)
-            if (data.insertedId) {
-                toast.success("User log in successfully")
+            const tokenRes = await axiosSecure.post('/jwt', { email: res.user.email });
+            console.log("Token Response =>", tokenRes.data)
+
+            if (data.insertedId || tokenRes.data.success) {
+                toast.success("User logged in successfully")
             }
             navigate('/')
         } catch (error) {
