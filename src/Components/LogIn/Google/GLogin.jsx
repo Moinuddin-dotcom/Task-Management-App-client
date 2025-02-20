@@ -3,6 +3,7 @@ import useAuth from "../../Hooks/useAuth"
 // import useAxiosPublic from "../../Hooks/useAxiosPublic"
 import { useNavigate } from "react-router-dom"
 import useAxiosSecure from "../../Hooks/useAxiosSecure"
+import { Button } from "@headlessui/react"
 
 
 const GLogin = () => {
@@ -35,12 +36,11 @@ const GLogin = () => {
     }
     return (
         <div>
-            <button
+            <Button
                 onClick={handleGoogle}
-                className="flex-1 bg-gray-800 text-white py-2 px-4 rounded flex items-center justify-center gap-2">
-                {/* <img src={googleLogo} alt="google icon" className='h-8' /> */}
+                className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[open]:bg-gray-700 data-[focus]:outline-1 data-[focus]:outline-white">
                 <span>Google</span>
-            </button>
+            </Button>
         </div>
     )
 }
