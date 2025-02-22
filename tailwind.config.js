@@ -1,3 +1,7 @@
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+
 /** @type {import('tailwindcss').Config} */
 export const content = [
     './src/**/*.{html,js,jsx,ts,tsx}', // Adjust this path based on your project structure
