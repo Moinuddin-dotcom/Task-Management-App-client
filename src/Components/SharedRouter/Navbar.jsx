@@ -50,8 +50,8 @@ const Navbar = () => {
         <ul className="menu menu-horizontal px-1">
           {navLinks}
         </ul>
-        <a className="btn btn-ghost text-xl hidden md:flex">Task Management Application</a>
-        <a className="btn btn-ghost text-xl md:hidden">TODO App</a>
+        {/* <a className="btn btn-ghost text-xl hidden md:flex">Task Management Application</a>
+        <a className="btn btn-ghost text-xl md:hidden">TODO App</a> */}
       </div>
       <div className="navbar-end">
         <button
