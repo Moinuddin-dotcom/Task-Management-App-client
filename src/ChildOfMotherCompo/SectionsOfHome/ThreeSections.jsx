@@ -90,7 +90,7 @@ const ThreeSections = () => {
 
     return (
         <div className="p-4">
-            <form onSubmit={handleSubmit(onSubmit)} className="mb-4 p-4 bg-gray-100 rounded-lg">
+            <form onSubmit={handleSubmit(onSubmit)} className="md:max-w-xl xl:max-w-4xl mx-auto mb-4 p-4 bg-gray-100 rounded-lg">
                 {/* Title Field */}
                 <input
                     {...register("title", { required: "Task title is required", maxLength: { value: 50, message: "Title cannot exceed 50 characters" } })}
