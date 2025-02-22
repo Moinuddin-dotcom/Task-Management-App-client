@@ -1,4 +1,4 @@
-// import { Link } from "react-router-dom"
+import { Link } from "react-router-dom"
 import useAuth from "../Hooks/useAuth"
 import toast from "react-hot-toast"
 import { Button } from '@headlessui/react'
@@ -8,6 +8,7 @@ import { MoonIcon, SunIcon } from '@heroicons/react/16/solid'
 
 
 const Navbar = () => {
+
   const { user, logout } = useAuth()
   const [isDarkMode, setIsDarkMode] = useState(false)
 
@@ -33,6 +34,11 @@ const Navbar = () => {
       .catch((err) => toast.error(err.message));
   }
 
+  const navLinks = <>
+    <li><Link to={'/'}>Home</Link></li>
+    <li><Link to={'/activitylog'}>Activity Log</Link></li>
+  </>
+
 
 
 
@@ -41,16 +47,13 @@ const Navbar = () => {
     //   <CssBaseline />
     <div className="navbar shadow-sm " data-theme={isDarkMode ? 'dark' : 'light'}>
       <div className="navbar-start ">
+        <ul className="menu menu-horizontal px-1">
+          {navLinks}
+        </ul>
         <a className="btn btn-ghost text-xl hidden md:flex">Task Management Application</a>
         <a className="btn btn-ghost text-xl md:hidden">TODO App</a>
       </div>
       <div className="navbar-end">
-        {/* <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="btn btn-ghost btn-circle"
-          >
-            {darkMode ? <SunIcon className="w-6 h-6 text-yellow-400" /> : <MoonIcon className="w-6 h-6 text-blue-600" />}
-          </button> */}
         <button
           onClick={toggleDarkMode}
           className="btn btn-ghost btn-circle"
