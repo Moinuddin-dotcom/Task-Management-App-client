@@ -89,8 +89,13 @@ const ThreeSections = () => {
     if (isLoading) return <Loading />
 
     return (
-        <div className="p-4">
-            <form onSubmit={handleSubmit(onSubmit)} className="md:max-w-xl xl:max-w-4xl mx-auto mb-4 p-4 bg-gray-100 rounded-lg">
+        <div className="threeSection p-4" style={{ backgroundColor: 'var(--color-bg-primary)', color: 'var(--color-text-primary)' }}>
+            <form onSubmit={handleSubmit(onSubmit)} className="fromSection md:max-w-xl xl:max-w-4xl mx-auto mb-4 p-4 bg-gray-100 rounded-lg"
+                style={{
+                    backgroundColor: 'var(--color-bg-secondary)',
+                    color: 'var(--color-text-primary)'
+                }}
+            >
                 {/* Title Field */}
                 <input
                     {...register("title", { required: "Task title is required", maxLength: { value: 50, message: "Title cannot exceed 50 characters" } })}
@@ -115,15 +120,27 @@ const ThreeSections = () => {
                     <option value="In Progress">In Progress</option>
                     <option value="Done">Done</option>
                 </select>
+                <div className="text-center">
 
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer">Add Task</button>
+                    <button type="submit" className="bg-blue-500 btn btn-wide text-white px-4 py-2 rounded cursor-pointer"
+                        style={{
+                            backgroundColor: 'var(--color-button-bg)',
+                            color: 'var(--color-button-text)'
+                        }}
+                    >Add Task</button>
+                </div>
             </form>
             <DragDropContext onDragEnd={onDragEnd} >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {["To-Do", "In Progress", "Done"].map((category) => (
                         <Droppable key={category} droppableId={category} >
                             {(provided) => (
-                                <div ref={provided.innerRef} {...provided.droppableProps} className="p-4 bg-white rounded shadow-md">
+                                <div ref={provided.innerRef} {...provided.droppableProps} className="p-4 bg-white rounded shadow-md"
+                                    style={{
+                                        backgroundColor: 'var(--color-bg-secondary)',
+                                        color: 'var(--color-text-primary)'
+                                    }}
+                                >
                                     <h2 className="text-xl font-bold mb-2">{category}</h2>
                                     {tasks.filter((task) => task.category === category).length === 0 ? (
                                         <p className="text-gray-500 text-center">No tasks found</p>

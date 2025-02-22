@@ -11,6 +11,7 @@ Todo Client is a web application that allows users to manage their daily tasks e
 - Task management with drag-and-drop support (via `@hello-pangea/dnd`)
 - Responsive UI with Tailwind CSS
 - A clean and modern interface with Headless UI components
+- Dark mode toggle
 
 ## Technologies Used
 
@@ -19,6 +20,7 @@ Todo Client is a web application that allows users to manage their daily tasks e
 - **Vite** - A fast and lean development build tool.
 - **Axios** - A promise-based HTTP client for making requests to the server.
 - **React Query** - A data-fetching and state management library for React.
+- **TanStack Query**
 - **Firebase** - Used for authentication (Google login) and real-time database management.
 - **DaisyUI** - A plugin for Tailwind CSS that provides pre-built UI components.
 - **Headless UI** - A set of completely unstyled, fully accessible UI components.
