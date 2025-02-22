@@ -9,27 +9,40 @@ import Loading from "../../Components/Loading/Loading";
 import { useState } from "react";
 import useAuth from "../../Components/Hooks/useAuth";
 
+// import { DndContext, closestCorners } from "@dnd-kit/core";
+// import { useDraggable, useDroppable } from "@dnd-kit/core";
+
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+
+
+
 const ThreeSections = () => {
     const { user } = useAuth()
+    const axiosSecure = useAxiosSecure()
+    const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
     // two stats for tasks updating
     const [editingTaskId, setEditingTaskId] = useState(null)
     const [updateTask, setUpdateTask] = useState({ title: "", description: "" })
-
-
-    const axiosSecure = useAxiosSecure()
-    const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
     // getting all tasks from db 
     const [tasks, isLoading, refetch] = useAllTasks()
     refetch()
     console.log(tasks)
 
+    // const Cattasks = tasks.map((task) => <h1>{ task.category }</h1> )
+    // console.log(Cattasks)
+
     // accepting from data from input fields
     const onSubmit = async (data) => {
         console.log(data)
-        const newTask = { ...data, id: Date.now(), timestamp: new Date().toISOString(), email: user?.email };
-        // posting from data named as tasks , saving them in db
+        const newTask = {
+            ...data,
+            id: Date.now(),
+            timestamp: new Date().toISOString(),
+            email: user?.email
+        };
+        // posting (from) data named as tasks , saving them in db
         const { data: taskData } = await axiosSecure.post('/tasks', newTask)
         console.log(taskData);
         toast.success("Task added successfully")
@@ -46,17 +59,31 @@ const ThreeSections = () => {
         refetch()
     }
 
+    // handling edit btn
     const handleEdit = (task) => {
         setEditingTaskId(task._id);
         setUpdateTask({ title: task.title, description: task.description });
     };
 
+    // updating a task
     const handleUpdate = async (id) => {
         await axiosSecure.put(`/tasks/${id}`, updateTask);
         toast.success("Task updated successfully");
-        setEditingTaskId(null);  // Exit edit mode
+        setEditingTaskId(null);
         refetch();
     };
+
+    const onDragEnd = async (result) => {
+        if (!result.destination) return;
+        const { draggableId, destination } = result;
+
+        const taskToUpdate = tasks.find(task => task._id === draggableId)
+        if (taskToUpdate.category !== destination.droppableId) {
+            await axiosSecure.put(`/tasks/${draggableId}`, { category: destination.droppableId })
+            toast.success("Task updated successfully")
+            refetch();
+        }
+    }
 
 
     if (isLoading) return <Loading />
@@ -91,68 +118,88 @@ const ThreeSections = () => {
 
                 <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer">Add Task</button>
             </form>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {["To-Do", "In Progress", "Done"].map((category) => (
-                    <div key={category} className="p-4 bg-white rounded shadow-md">
-                        <h2 className="text-xl font-bold mb-2">{category}</h2>
-                        {tasks.filter((task) => task.category === category).length === 0 ? (
-                            <p className="text-gray-500 text-center">No tasks found</p>
-                        ) : (
-                            tasks.filter((task) => task.category === category).map((task) => (
-                                <div key={task._id} className="p-2 border rounded mb-2 flex items-center justify-between">
-                                    {/* Check if editing */}
-                                    {editingTaskId === task._id ? (
-                                        <div>
-                                            <input
-                                                type="text"
-                                                value={updateTask.title}
-                                                onChange={(e) => setUpdateTask({ ...updateTask, title: e.target.value })}
-                                                className="block w-full p-2 border rounded mb-2"
-                                            />
-                                            <textarea
-                                                value={updateTask.description}
-                                                onChange={(e) => setUpdateTask({ ...updateTask, description: e.target.value })}
-                                                className="block w-full p-2 border rounded mb-2"
-                                            />
-                                            <button
-                                                onClick={() => handleUpdate(task._id)}
-                                                className="bg-green-500 text-white px-3 py-1 rounded btn"
-                                            >
-                                                Update
-                                            </button>
-                                        </div>
+            <DragDropContext onDragEnd={onDragEnd} >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {["To-Do", "In Progress", "Done"].map((category) => (
+                        <Droppable key={category} droppableId={category} >
+                            {(provided) => (
+                                <div ref={provided.innerRef} {...provided.droppableProps} className="p-4 bg-white rounded shadow-md">
+                                    <h2 className="text-xl font-bold mb-2">{category}</h2>
+                                    {tasks.filter((task) => task.category === category).length === 0 ? (
+                                        <p className="text-gray-500 text-center">No tasks found</p>
                                     ) : (
-                                        <div className="">
-                                            <h3 className="font-semibold">{task.title}</h3>
-                                            <p className="text-sm w-80">{task.description}</p>
-                                            <span className="text-xs text-gray-500">
-                                                Task Added on: {new Date(task.timestamp).toLocaleString()}
-                                            </span>
-                                            {task.lastModified && (
-                                                <span className="text-xs text-gray-500 block">
-                                                    Last Modified: {new Date(task.lastModified).toLocaleString()}
-                                                </span>
-                                            )}
-                                        </div>
+                                        tasks.filter((task) => task.category === category).map((task, index) => (
+                                            <Draggable key={task._id} draggableId={task._id} index={index}>
+                                                {(provided) => (
+                                                    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className=" p-2 border rounded mb-2 flex items-center justify-between">
+                                                        {/* Check if editing */}
+                                                        {editingTaskId === task._id ? (
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    value={updateTask.title}
+                                                                    onChange={(e) => setUpdateTask({ ...updateTask, title: e.target.value })}
+                                                                    className="block w-full p-2 border rounded mb-2"
+                                                                />
+                                                                <textarea
+                                                                    value={updateTask.description}
+                                                                    onChange={(e) => setUpdateTask({ ...updateTask, description: e.target.value })}
+                                                                    className="block w-full p-2 border rounded mb-2"
+                                                                />
+                                                                <button
+                                                                    onClick={() => handleUpdate(task._id)}
+                                                                    className="bg-green-500 text-white px-3 py-1 rounded btn"
+                                                                >
+                                                                    Update
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="w-full  ">
+                                                                <h3 className="font-semibold">{task.title}</h3>
+                                                                <p className="text-sm lg:w-[20vw] ">{task.description}</p>
+                                                                <span className="text-xs text-gray-500">
+                                                                    Task Added on: {new Date(task.timestamp).toLocaleString()}
+                                                                </span>
+                                                                {task.lastModified && (
+                                                                    <span className="text-xs text-gray-500 block">
+                                                                        Last Modified: {new Date(task.lastModified).toLocaleString()}
+                                                                    </span>
+                                                                )}
+                                                                <div className="lg:hidden flex justify-around gap-2 mt-4">
+                                                                    <button onClick={() => handleEdit(task)} className="btn">
+                                                                        <img src={editIcon} alt="Edit" className="w-5 h-5" />
+                                                                    </button>
+                                                                    <button onClick={() => handleDelete(task._id)} className="btn">
+                                                                        <img src={deleteIcon} alt="Delete" className="w-5 h-5" />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Edit & Delete Buttons */}
+                                                        <div className="hidden lg:flex flex-col gap-2 ">
+                                                            <button onClick={() => handleEdit(task)} className="btn">
+                                                                <img src={editIcon} alt="Edit" className="w-5 h-4 lg:h-5" />
+                                                            </button>
+                                                            <button onClick={() => handleDelete(task._id)} className="btn">
+                                                                <img src={deleteIcon} alt="Delete" className="w-5 lg:w-6 h-4 lg:h-5" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </Draggable>
+
+                                        ))
                                     )}
-
-                                    {/* Edit & Delete Buttons */}
-                                    <div className="flex flex-col gap-2 ">
-                                        <button onClick={() => handleEdit(task)} className="btn">
-                                            <img src={editIcon} alt="Edit" className="w-5 h-5" />
-                                        </button>
-                                        <button onClick={() => handleDelete(task._id)} className="btn">
-                                            <img src={deleteIcon} alt="Delete" className="w-5 h-5" />
-                                        </button>
-                                    </div>
+                                    {provided.placeholder}
                                 </div>
-                            ))
-                        )}
+                            )}
+                        </Droppable>
 
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            </DragDropContext>
+
 
 
         </div>
@@ -160,3 +207,6 @@ const ThreeSections = () => {
 }
 
 export default ThreeSections
+
+
+

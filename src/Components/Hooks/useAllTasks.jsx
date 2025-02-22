@@ -21,6 +21,3 @@ const useAllTasks = () => {
 
 export default useAllTasks
 
-
-// const { data: getTaskData } = await axiosSecure.get('/tasks')
-// console.log(getTaskData)

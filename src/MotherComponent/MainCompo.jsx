@@ -2,6 +2,8 @@
 
 import { Outlet } from "react-router-dom"
 import Navbar from "../Components/SharedRouter/Navbar"
+// import Home from "../ChildOfMotherCompo/Home"
+import Footer from "../Components/SharedRouter/Footer"
 
 const MainCompo = () => {
     return (
@@ -11,9 +13,10 @@ const MainCompo = () => {
             </header>
             <main>
                 <Outlet />
+                {/* <Home /> */}
             </main>
             <footer>
-                <h1 className="text-4xl text-center font-bold">Hey I am a Footer</h1>
+                <Footer />
             </footer>
         </div>
     )

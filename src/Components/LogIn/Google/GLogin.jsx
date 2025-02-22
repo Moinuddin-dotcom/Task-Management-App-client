@@ -17,9 +17,9 @@ const GLogin = () => {
             console.log("Google data=>", res.user)
 
             const userInfo = {
-                email: res.user.email,
-                name: res.user.displayName,
-                photo: res.user.photoURL,
+                email: res.user?.email,
+                name: res.user?.displayName,
+                photo: res.user?.photoURL,
             }
             const { data } = await axiosSecure.post('/users', userInfo)
             console.log(data)
